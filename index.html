@@ -1,6 +1,86 @@
-极简版个人导航
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>极简导航</title>
+  <style>
+    body {
+      max-width: 800px;
+      margin: 20px auto;
+      font-family: "Microsoft YaHei", sans-serif;
+      background-color: #f0f8ff; /* ← 全页浅蓝色背景 */
+      padding: 0 16px;
+    }
+    h1 { text-align: center; margin-top: 24px; color: #2c3e50; }
+    .lang-toggle { text-align: right; margin-bottom: 12px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, 120px);
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn {
+      display: block;
+      padding: 12px;
+      text-align: center;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #333;
+      background: #ffffff; /* 按钮白底，确保可读性 */
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      transition: transform 0.1s;
+    }
+    .btn:hover { transform: translateY(-1px); }
+    .btn-pink {
+      background: #e6f0ff; /* 浅蓝按钮底 */
+      color: #d81b60;     /* 粉色文字 */
+    }
+    #langToggle {
+      padding: 6px 12px;
+      font-size: 14px;
+      background: #ffffff;
+      border: 1px solid #bdc3c7;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+  <div class="lang-toggle">
+    <button id="langToggle">EN</button>
+  </div>
 
+  <h1 id="pageTitle">数据删除killer导航页</h1>
 
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>极简导航</title></head><body style="max-width:800px;margin:20px auto;font-family:微软雅黑"><h1 style="text-align:center">数据删除killer导航页</h1><div style="display:grid;grid-template-columns:repeat(auto-fill,120px);gap:10px;margin-top:30px"><a href="https://www.baidu.com" style="display:block;padding:12px;text-align:center;background:#f5f7fa;border-radius:8px;text-decoration:none;color:#333" target="_blank">百度</a><a href="https://www.bilibili.com" style="display:block;padding:12px;text-align:center;background:#f5f7fa;border-radius:8px;text-decoration:none;color:#333" target="_blank">B站</a><a href="https://mail.qq.com" style="display:block;padding:12px;text-align:center;background:#f5f7fa;border-radius:8px;text-decoration:none;color:#333" target="_blank">QQ邮箱</a><a href="https://space.bilibili.com/3546891629366171?spm_id_from=333.337.0.0" style="display:block;padding:12px;text-align:center;background:#f5f7fa;border-radius:8px;text-decoration:none;color:#333" target="_blank">我的b站空间</a></div></body></html>
+  <div class="grid">
+    <a href="https://www.baidu.com" class="btn btn-default" target="_blank" data-zh="百度" data-en="Baidu">百度</a>
+    <a href="https://www.bilibili.com" class="btn btn-default" target="_blank" data-zh="B站" data-en="Bilibili">B站</a>
+    <a href="https://www.microsoft.com/zh-cn/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook" class="btn btn-default" target="_blank" data-zh="Outlook邮箱" data-en="Outlook Email">Outlook邮箱</a>
+    <a href="https://space.bilibili.com/3546891629366171?spm_id_from=333.337.0.0" class="btn btn-pink" target="_blank" data-zh="我的b站空间" data-en="My Bilibili">我的b站空间</a>
+  </div>
+
+  <script>
+    const langToggle = document.getElementById('langToggle');
+    const pageTitle = document.getElementById('pageTitle');
+    const links = document.querySelectorAll('.btn');
+
+    let currentLang = 'zh';
+
+    langToggle.addEventListener('click', () => {
+      currentLang = currentLang === 'zh' ? 'en' : 'zh';
+      langToggle.textContent = currentLang === 'zh' ? 'EN' : 'ZH';
+
+      pageTitle.textContent = currentLang === 'zh'
+        ? '数据删除killer导航页'
+        : 'Data Deletion Killer — Quick Links';
+
+      links.forEach(link => {
+        link.textContent = link.getAttribute(`data-${currentLang}`) || link.textContent;
+      });
+    });
+  </script>
+</body>
+</html>
  
-
