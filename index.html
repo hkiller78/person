@@ -9,7 +9,7 @@
       max-width: 800px;
       margin: 20px auto;
       font-family: "Microsoft YaHei", sans-serif;
-      background-color: #f0f8ff; /* ← 全页浅蓝色背景 */
+      background-color: #f0f8ff;
       padding: 0 16px;
     }
     h1 { text-align: center; margin-top: 24px; color: #2c3e50; }
@@ -27,14 +27,24 @@
       border-radius: 8px;
       text-decoration: none;
       color: #333;
-      background: #ffffff; /* 按钮白底，确保可读性 */
+      background: #ffffff;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
       transition: transform 0.1s;
     }
     .btn:hover { transform: translateY(-1px); }
     .btn-pink {
-      background: #e6f0ff; /* 浅蓝按钮底 */
-      color: #d81b60;     /* 粉色文字 */
+      background: #e6f0ff;
+      color: #d81b60;
+    }
+    .btn-secret {
+      background: #ecf4fd;
+      color: #2980b9;
+      border: 1px solid #a0cfff;
+      font-weight: 600;
+    }
+    .btn-secret:hover {
+      background: #d9eaf9;
+      border-color: #71b7e7;
     }
     #langToggle {
       padding: 6px 12px;
@@ -44,6 +54,18 @@
       border-radius: 4px;
       cursor: pointer;
       color: #2c3e50;
+    }
+    .secret-content {
+      margin-top: 24px;
+      padding: 16px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 14px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      border-left: 4px solid #3498db;
     }
   </style>
 </head>
@@ -59,26 +81,45 @@
     <a href="https://www.bilibili.com" class="btn btn-default" target="_blank" data-zh="B站" data-en="Bilibili">B站</a>
     <a href="https://www.microsoft.com/zh-cn/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook" class="btn btn-default" target="_blank" data-zh="Outlook邮箱" data-en="Outlook Email">Outlook邮箱</a>
     <a href="https://space.bilibili.com/3546891629366171?spm_id_from=333.337.0.0" class="btn btn-pink" target="_blank" data-zh="我的b站空间" data-en="My Bilibili">我的b站空间</a>
+    <button class="btn btn-secret" id="secretBtn">AI密钥区</button>
   </div>
+
+  <div id="secretArea" class="secret-content" style="display:none;"></div>
 
   <script>
     const langToggle = document.getElementById('langToggle');
     const pageTitle = document.getElementById('pageTitle');
-    const links = document.querySelectorAll('.btn');
+    const links = document.querySelectorAll('.btn:not(#secretBtn)');
+    const secretBtn = document.getElementById('secretBtn');
+    const secretArea = document.getElementById('secretArea');
 
     let currentLang = 'zh';
 
+    // 语言切换
     langToggle.addEventListener('click', () => {
       currentLang = currentLang === 'zh' ? 'en' : 'zh';
       langToggle.textContent = currentLang === 'zh' ? 'EN' : 'ZH';
-
       pageTitle.textContent = currentLang === 'zh'
         ? '数据删除killer导航页'
         : 'Data Deletion Killer — Quick Links';
-
       links.forEach(link => {
         link.textContent = link.getAttribute(`data-${currentLang}`) || link.textContent;
       });
+    });
+
+    // 密码保护区域
+    secretBtn.addEventListener('click', () => {
+      const pwd = prompt('请输入访问密码：', '');
+      if (pwd === '6767') {
+        secretArea.textContent = `aikey  de571e67cc06424ead37a0b7f8b8555c.awlJjOtelScv7usi
+AIMODE
+GLM-4-Flash-250414
+base http
+https://open.bigmodel.cn/api/paas/v4`;
+        secretArea.style.display = 'block';
+      } else {
+        alert(' 密码错误，请重试。');
+      }
     });
   </script>
 </body>
