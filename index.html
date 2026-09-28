@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -13,12 +14,11 @@
       padding: 0 16px;
     }
     h1 { text-align: center; margin-top: 24px; color: #2c3e50; }
-    .lang-toggle { text-align: right; margin-bottom: 12px; }
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, 120px);
       gap: 10px;
-      margin-top: 20px;
+      margin-top: 16px;
     }
     .btn {
       display: block;
@@ -46,7 +46,10 @@
       background: #d9eaf9;
       border-color: #71b7e7;
     }
-    #langToggle {
+    .lang-toggle {
+      position: absolute;
+      top: 16px;
+      right: 16px;
       padding: 6px 12px;
       font-size: 14px;
       background: #ffffff;
@@ -70,58 +73,87 @@
   </style>
 </head>
 <body>
-  <div class="lang-toggle">
-    <button id="langToggle">EN</button>
-  </div>
-
+  <button id="langToggle" class="lang-toggle">EN</button>
   <h1 id="pageTitle">数据删除killer导航页</h1>
 
   <div class="grid">
-    <a href="https://www.baidu.com" class="btn btn-default" target="_blank" data-zh="百度" data-en="Baidu">百度</a>
-    <a href="https://www.bilibili.com" class="btn btn-default" target="_blank" data-zh="B站" data-en="Bilibili">B站</a>
-    <a href="https://www.microsoft.com/zh-cn/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook" class="btn btn-default" target="_blank" data-zh="Outlook邮箱" data-en="Outlook Email">Outlook邮箱</a>
-    <a href="https://space.bilibili.com/3546891629366171?spm_id_from=333.337.0.0" class="btn btn-pink" target="_blank" data-zh="我的b站空间" data-en="My Bilibili">我的b站空间</a>
-    <button class="btn btn-secret" id="secretBtn">AI密钥区</button>
+    <a href="https://www.baidu.com" class="btn btn-default" data-i18n-key="baidu">百度</a>
+    <a href="https://www.bilibili.com" class="btn btn-default" data-i18n-key="bilibili">B站</a>
+    <a href="https://www.microsoft.com/zh-cn/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook" class="btn btn-default" data-i18n-key="outlook">Outlook邮箱</a>
+    <a href="https://space.bilibili.com/3546891629366171?spm_id_from=333.337.0.0" class="btn btn-pink" data-i18n-key="mybilibili">我的b站空间</a>
+    <button class="btn btn-secret" id="secretBtn" data-i18n-key="secret">AI密钥区</button>
   </div>
 
   <div id="secretArea" class="secret-content" style="display:none;"></div>
 
   <script>
+    // 国际化字典（中英）
+    const i18n = {
+      zh: {
+        'baidu': '百度',
+        'bilibili': 'B站',
+        'outlook': 'Outlook邮箱',
+        'mybilibili': '我的b站空间',
+        'secret': 'AI密钥区',
+        'pageTitle': '数据删除killer导航页'
+      },
+      en: {
+        'baidu': 'Baidu',
+        'bilibili': 'Bilibili',
+        'outlook': 'Outlook Email',
+        'mybilibili': 'My Bilibili',
+        'secret': 'AI Key Zone',
+        'pageTitle': 'Data Deletion Killer — Quick Links'
+      }
+    };
+
     const langToggle = document.getElementById('langToggle');
     const pageTitle = document.getElementById('pageTitle');
-    const links = document.querySelectorAll('.btn:not(#secretBtn)');
+    const links = document.querySelectorAll('.btn');
     const secretBtn = document.getElementById('secretBtn');
     const secretArea = document.getElementById('secretArea');
 
     let currentLang = 'zh';
 
-    // 语言切换
-    langToggle.addEventListener('click', () => {
-      currentLang = currentLang === 'zh' ? 'en' : 'zh';
-      langToggle.textContent = currentLang === 'zh' ? 'EN' : 'ZH';
-      pageTitle.textContent = currentLang === 'zh'
-        ? '数据删除killer导航页'
-        : 'Data Deletion Killer — Quick Links';
-      links.forEach(link => {
-        link.textContent = link.getAttribute(`data-${currentLang}`) || link.textContent;
+    // 初始化语言
+    function applyLang(lang) {
+      currentLang = lang;
+      langToggle.textContent = lang === 'zh' ? 'EN' : 'ZH';
+      pageTitle.textContent = i18n[lang].pageTitle;
+      links.forEach(el => {
+        const key = el.getAttribute('data-i18n-key');
+        if (key && i18n[lang][key]) {
+          if (el.tagName === 'A') el.textContent = i18n[lang][key];
+          else if (el.tagName === 'BUTTON') el.textContent = i18n[lang][key];
+        }
       });
+    }
+
+    // 切换语言
+    langToggle.addEventListener('click', () => {
+      applyLang(currentLang === 'zh' ? 'en' : 'zh');
     });
 
-    // 密码保护区域
+    // 密钥区域（Base64 混淆）
+    const encodedText = "YWlrZXkgZGU1NzFlNjdjYzA2NDI0ZWFkMzdhMGI3ZjhiODU1NWMuYXdsSmJPdGVsU2N2N3VzaQoKQUlNT0RFCgpHTE0tNC1GbGFzaC0yNTA0MTQKCmJhc2UgaHR0cAoKaHR0cHM6Ly9vcGVuLmJpZ21vZGVsLmNuL2FwaS9wYWFzL3Y0";
+
     secretBtn.addEventListener('click', () => {
       const pwd = prompt('请输入访问密码：', '');
       if (pwd === '6767') {
-        secretArea.textContent = `aikey  de571e67cc06424ead37a0b7f8b8555c.awlJjOtelScv7usi
-AIMODE
-GLM-4-Flash-250414
-base http
-https://open.bigmodel.cn/api/paas/v4`;
-        secretArea.style.display = 'block';
+        try {
+          secretArea.textContent = atob(encodedText);
+          secretArea.style.display = 'block';
+        } catch (e) {
+          secretArea.textContent = '[解码失败，请检查浏览器兼容性]';
+          secretArea.style.display = 'block';
+        }
       } else {
         alert(' 密码错误，请重试。');
       }
     });
+
+    // 首次加载应用中文
+    applyLang('zh');
   </script>
 </body>
 </html>
- 
