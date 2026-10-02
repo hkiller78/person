@@ -1,0 +1,282 @@
+
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>像素小恐龙游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        #game-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 80vh;
+            background-color: #fff;
+            overflow: hidden;
+            border: 2px solid #333;
+            touch-action: manipulation;
+        }
+        #dino {
+            position: absolute;
+            width: 50px;
+            height: 80px;
+            background-color: #8B4513;
+            bottom: 0;
+            left: 50px;
+            border-radius: 5px;
+        }
+        .cactus {
+            position: absolute;
+            width: 20px;
+            height: 40px;
+            background-color: #2F4F4F;
+            bottom: 0;
+            right: 0;
+            border-radius: 3px;
+        }
+        #score {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        #game-over-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            z-index: 10;
+        }
+        #game-over-screen h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        #game-over-screen p {
+            font-size: 24px;
+            margin-bottom: 30px;
+        }
+        #game-over-screen button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+            min-width: 200px;
+        }
+        #game-over-screen button:hover {
+            background-color: #45a049;
+        }
+        #ground {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <div id="ground"></div>
+        <div id="dino"></div>
+        <div id="score">得分: 0</div>
+        <div id="game-over-screen" style="display: none;">
+            <h1>游戏结束</h1>
+            <p>你的得分: <span id="final-score">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        const dino = document.getElementById('dino');
+        const gameContainer = document.getElementById('game-container');
+        const scoreElement = document.getElementById('score');
+        const gameOverScreen = document.getElementById('game-over-screen');
+        const finalScoreElement = document.getElementById('final-score');
+        
+        let score = 0;
+        let isJumping = false;
+        let isGameOver = false;
+        let gameSpeed = 5;
+        let cactusInterval = 2000;
+        let lastCactusTime = 0;
+        let gameContainerWidth = gameContainer.offsetWidth;
+        let gameContainerHeight = gameContainer.offsetHeight;
+        
+        // 确保游戏容器适应屏幕大小
+        function updateGameContainerSize() {
+            gameContainerWidth = gameContainer.offsetWidth;
+            gameContainerHeight = gameContainer.offsetHeight;
+        }
+        
+        window.addEventListener('resize', updateGameContainerSize);
+        
+        // 开始游戏
+        function startGame() {
+            gameOverScreen.style.display = 'none';
+            score = 0;
+            scoreElement.textContent = `得分: ${score}`;
+            isGameOver = false;
+            gameSpeed = 5;
+            lastCactusTime = Date.now();
+            
+            // 清除所有岩石
+            const cacti = document.querySelectorAll('.cactus');
+            cacti.forEach(cactus => cactus.remove());
+            
+            // 重置恐龙位置
+            dino.style.bottom = '0px';
+            
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // 当页面加载完成后立即开始游戏
+  window.addEventListener('load', startGame);
+        
+        function jump() {
+            if (!isJumping && !isGameOver) {
+                isJumping = true;
+                let jumpHeight = 0;
+                let jumpUp = true;
+                
+                const jumpInterval = setInterval(() => {
+                    if (jumpUp) {
+                        jumpHeight += 5;
+                        if (jumpHeight >= 100) {
+                            jumpUp = false;
+                        }
+                    } else {
+                        jumpHeight -= 5;
+                        if (jumpHeight <= 0) {
+                            clearInterval(jumpInterval);
+                            isJumping = false;
+                            dino.style.bottom = '0px';
+                        }
+                    }
+                    dino.style.bottom = `${0 + jumpHeight}px`;
+                }, 20);
+            }
+        }
+        
+        function createCactus() {
+            if (Date.now() - lastCactusTime > cactusInterval) {
+                const cactus = document.createElement('div');
+                cactus.classList.add('cactus');
+                
+                // 随机生成不同高度的岩石
+                const height = Math.floor(Math.random() * 30) + 30; // 30-60px
+                cactus.style.height = `${height}px`;
+                
+                cactus.style.right = '0px';
+                gameContainer.appendChild(cactus);
+                lastCactusTime = Date.now();
+                
+                // 随机化岩石生成间隔
+                cactusInterval = Math.max(1000, cactusInterval - 20);
+            }
+        }
+        
+        function moveCacti() {
+            const cacti = document.querySelectorAll('.cactus');
+            cacti.forEach(cactus => {
+                let right = parseInt(cactus.style.right) || 0;
+                right += gameSpeed;
+                cactus.style.right = `${right}px`;
+                
+                if (right > gameContainerWidth + 50) {
+                    cactus.remove();
+                }
+                
+                // 碰撞检测
+                if (checkCollision(dino, cactus)) {
+                    gameOver();
+                }
+            });
+        }
+        
+        function checkCollision(dino, cactus) {
+            const dinoRect = dino.getBoundingClientRect();
+            const cactusRect = cactus.getBoundingClientRect();
+            
+            return !(
+                dinoRect.right < cactusRect.left ||
+                dinoRect.left > cactusRect.right ||
+                dinoRect.bottom < cactusRect.top ||
+                dinoRect.top > cactusRect.bottom - 5 // 允许恐龙头部略微超过岩石顶部
+            );
+        }
+        
+        function gameOver() {
+            isGameOver = true;
+            const cacti = document.querySelectorAll('.cactus');
+            cacti.forEach(cactus => {
+                cactus.style.display = 'none';
+            });
+            
+            finalScoreElement.textContent = score;
+            
+            // 延迟后重新开始游戏
+            setTimeout(startGame, 1000);
+        }
+        
+        function updateScore() {
+            score += 1;
+            scoreElement.textContent = `得分: ${score}`;
+        }
+        
+        function gameLoop() {
+            if (!isGameOver) {
+                createCactus();
+                moveCacti();
+                updateScore();
+                requestAnimationFrame(gameLoop);
+            }
+        }
+        
+        // 键盘事件监听
+        document.addEventListener('keydown', (event) => {
+            if (event.code === 'Space') {
+                jump();
+                event.preventDefault();
+            }
+        });
+        
+        // 触摸事件监听
+        gameContainer.addEventListener('touchstart', (event) => {
+            jump();
+            event.preventDefault();
+        });
+        
+        // 防止安卓设备上的双击缩放
+        gameContainer.addEventListener('touchmove', (event) => {
+            if (event.touches.length > 1) {
+                event.preventDefault();
+            }
+        }, { passive: false });
+    </script>
+</body>
+</html>
+      
