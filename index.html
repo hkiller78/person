@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+
+<button id="loadButton">加载第二个网页</button>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>极简导航</title>
@@ -158,5 +160,14 @@
     // 首次加载应用中文
     applyLang('zh');
   </script>
+  <script>
+document.getElementById('loadButton').addEventListener('click', function() {
+  var newPage = document.createElement('iframe');
+  newPage.style.width = '100%';
+  newPage.style.height = '100vh';
+  document.body.appendChild(newPage);
+  newPage.src = 'long.html';
+});
+</script>
 </body>
 </html>
