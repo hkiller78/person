@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-
+ <body style="background-image: url('background.jpg'); margin: 0; overflow: hidden;background-size: cover;">
 <button id="loadButton">别笑，你也过不了第二关</button>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -161,12 +161,24 @@
     applyLang('zh');
   </script>
   <script>
-document.getElementById('loadButton').addEventListener('click', function() {
-  var newPage = document.createElement('iframe');
-  newPage.style.width = '100%';
-  newPage.style.height = '100vh';
-  document.body.appendChild(newPage);
-  newPage.src = 'long.html';
+ document.getElementById('loadButton').addEventListener('click', function() {
+  var iframe = document.createElement('iframe');
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.src = 'long.html';
+
+  var closeButton = document.createElement('button');
+  closeButton.textContent = '关闭';
+  closeButton.style.position = 'absolute';
+  closeButton.style.top = '10px';
+  closeButton.style.right = '10px';
+  closeButton.onclick = function() {
+    document.body.removeChild(iframe);
+    document.body.removeChild(closeButton);
+  };
+
+  document.body.appendChild(iframe);
+  document.body.appendChild(closeButton);
 });
 </script>
 </body>
