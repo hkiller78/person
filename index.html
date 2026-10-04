@@ -1,184 +1,229 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
  <body style="background-image: url('background.jpg'); margin: 0; overflow: hidden;background-size: cover;">
 <button id="loadButton">别笑，你也过不了第二关</button>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>极简导航</title>
-  <style>
-    body {
-      max-width: 800px;
-      margin: 20px auto;
-      font-family: "Microsoft YaHei", sans-serif;
-      background-color: #f0f8ff;
-      padding: 0 16px;
-    }
-    h1 { text-align: center; margin-top: 24px; color: #2c3e50; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, 120px);
-      gap: 10px;
-      margin-top: 16px;
-    }
-    .btn {
-      display: block;
-      padding: 12px;
-      text-align: center;
-      border-radius: 8px;
-      text-decoration: none;
-      color: #333;
-      background: #ffffff;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      transition: transform 0.1s;
-    }
-    .btn:hover { transform: translateY(-1px); }
-    .btn-pink {
-      background: #e6f0ff;
-      color: #d81b60;
-    }
-    .btn-secret {
-      background: #ecf4fd;
-      color: #2980b9;
-      border: 1px solid #a0cfff;
-      font-weight: 600;
-    }
-    .btn-secret:hover {
-      background: #d9eaf9;
-      border-color: #71b7e7;
-    }
-    .lang-toggle {
-      position: absolute;
-      top: 16px;
-      right: 16px;
-      padding: 6px 12px;
-      font-size: 14px;
-      background: #ffffff;
-      border: 1px solid #bdc3c7;
-      border-radius: 4px;
-      cursor: pointer;
-      color: #2c3e50;
-    }
-    .secret-content {
-      margin-top: 24px;
-      padding: 16px;
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-      font-family: "Consolas", "Courier New", monospace;
-      font-size: 14px;
-      line-height: 1.5;
-      white-space: pre-wrap;
-      border-left: 4px solid #3498db;
-    }
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width,initial-scale=1">
+ <title>极简导航</title>
+ <style>
+.photo-area{margin-top:20px;padding:16px;background:#fff;border-radius:8px;display:none;position:relative;}
+.photo-show{min-height:180px;display:flex;align-items:center;justify-content:center;background:#f0f8ff;border-radius:6px;margin-bottom:12px;}
+.photo-show img{max-width:100%;max-height:260px;object-fit:contain;}
+.close-photo-btn{position:absolute;top:8px;right:8px;border:none;outline:none;background:#e74c3c;color:#fff;padding:4px 8px;border-radius:4px;font-size:12px;cursor:pointer;}
+ #randPhotoBtn, #nextPhotoBtn {
+ border: none;
+ outline: none;
+}
+
+ body {
+ max-width: 800px;
+ margin: 20px auto;
+ font-family: "Microsoft YaHei", sans-serif;
+ background-color: #f0f8ff;
+ padding: 0 16px;
+ }
+ h1 { text-align: center; margin-top: 24px; color: #2c3e50; }
+.grid {
+ display: grid;
+ grid-template-columns: repeat(auto-fill, 120px);
+ gap: 10px;
+ margin-top: 16px;
+ }
+.btn {
+ display: block;
+ padding: 12px;
+ text-align: center;
+ border-radius: 8px;
+ text-decoration: none;
+ color: #333;
+ background: #ffffff;
+ box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+ transition: transform 0.1s;
+ }
+.btn:hover { transform: translateY(-1px); }
+.btn-pink {
+ background: #e6f0ff;
+ color: #d81b60;
+ }
+.btn-secret {
+ background: #ecf4fd;
+ color: #2980b9;
+ border: 1px solid #a0cfff;
+ font-weight: 600;
+ }
+.btn-secret:hover {
+ background: #d9eaf9;
+ border-color: #71b7e7;
+ }
+.lang-toggle {
+ position: absolute;
+ top: 16px;
+ right: 16px;
+ padding: 6px 12px;
+ font-size: 14px;
+ background: #ffffff;
+ border: 1px solid #bdc3c7;
+ border-radius: 4px;
+ cursor: pointer;
+ color: #2c3e50;
+ }
+.secret-content {
+ margin-top: 24px;
+ padding: 16px;
+ background: white;
+ border-radius: 8px;
+ box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+ font-family: "Consolas", "Courier New", monospace;
+ font-size: 14px;
+ line-height: 1.5;
+ white-space: pre-wrap;
+ border-left: 4px solid #3498db;
+ }
+ </style>
 </head>
 <body>
-  <button id="langToggle" class="lang-toggle">EN</button>
-  <h1 id="pageTitle">数据删除killer导航页</h1>
+ <button id="langToggle" class="lang-toggle">EN</button>
+ <h1 id="pageTitle">数据删除killer导航页</h1>
 
-  <div class="grid">
-    <a href="https://www.baidu.com" class="btn btn-default" data-i18n-key="baidu">百度</a>
-    <a href="https://www.bilibili.com" class="btn btn-default" data-i18n-key="bilibili">B站</a>
-    <a href="https://www.microsoft.com/zh-cn/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook" class="btn btn-default" data-i18n-key="outlook">Outlook邮箱</a>
-    <a href="https://space.bilibili.com/3546891629366171?spm_id_from=333.337.0.0" class="btn btn-pink" data-i18n-key="mybilibili">我的b站空间</a>
-    <button class="btn btn-secret" id="secretBtn" data-i18n-key="secret">AI密钥区</button>
-  </div>
+ <div class="grid">
+ <a href="https://www.baidu.com" class="btn btn-default" data-i18n-key="baidu">百度</a>
+ <a href="https://www.bilibili.com" class="btn btn-default" data-i18n-key="bilibili">B站</a>
+ <a href="https://www.microsoft.com/zh-cn/microsoft-365/outlook/email-and-calendar-software-microsoft-outlook" class="btn btn-default" data-i18n-key="outlook">Outlook邮箱</a>
+ <a href="https://space.bilibili.com/3546891629366171?spm_id_from=333.337.0.0" class="btn btn-pink" data-i18n-key="mybilibili">我的b站空间</a>
+ <button class="btn btn-secret" id="secretBtn" data-i18n-key="secret">AI密钥区</button>
+ </div>
+ <div class="grid">
+ <button class="btn" id="randPhotoBtn">骇爪美图</button>
+ <button class="btn" id="nextPhotoBtn">下一张</button>
+</div>
+<div class="photo-area" id="photoArea">
+ <button class="close-photo-btn" id="closePhotoBtn">关闭</button>
+ <div class="photo-show" id="photoBox">
+ <span class="photo-tip">点击按钮开始浏览</span>
+ </div>
+ <div style="text-align:center;margin-top:8px;color:#666;font-size:13px;" id="photoCount">0/0</div>
+</div>
 
-  <div id="secretArea" class="secret-content" style="display:none;"></div>
+ <div id="secretArea" class="secret-content" style="display:none;"></div>
 
-  <script>
-    // 国际化字典（中英）
-    const i18n = {
-      zh: {
-        'baidu': '百度',
-        'bilibili': 'B站',
-        'outlook': 'Outlook邮箱',
-        'mybilibili': '我的b站空间',
-        'secret': 'AI密钥区',
-        'pageTitle': '数据删除killer导航页'
-      },
-      en: {
-        'baidu': 'Baidu',
-        'bilibili': 'Bilibili',
-        'outlook': 'Outlook Email',
-        'mybilibili': 'My Bilibili',
-        'secret': 'AI Key Zone',
-        'pageTitle': 'Data Deletion Killer — Quick Links'
-      }
-    };
+ <script>
+ // 国际化字典（中英）
+ const i18n = {
+ zh: {
+ 'baidu': '百度',
+ 'bilibili': 'B站',
+ 'outlook': 'Outlook邮箱',
+'mybilibili': '我的b站空间',
+'secret': 'AI密钥区',
+ 'pageTitle': '数据删除killer导航页'
+ },
+ en: {
+ 'baidu': 'Baidu',
+ 'bilibili': 'Bilibili',
+ 'outlook': 'Outlook Email',
+'mybilibili': 'My Bilibili',
+'secret': 'AI Key Zone',
+ 'pageTitle': 'Data Deletion Killer — Quick Links'
+ }
+ };
+ const photos = ["1.jpg","2.jpg","3.jpg","4.jpg","5.jpg","6.jpeg","7.jpeg"]; // 这里填入你同目录下的图片文件名
+let idx = 0;
+const box = document.getElementById('photoBox');
+const count = document.getElementById('photoCount');
+const photoArea = document.getElementById('photoArea');
+const closePhotoBtn = document.getElementById('closePhotoBtn');
 
-    const langToggle = document.getElementById('langToggle');
-    const pageTitle = document.getElementById('pageTitle');
-    const links = document.querySelectorAll('.btn');
-    const secretBtn = document.getElementById('secretBtn');
-    const secretArea = document.getElementById('secretArea');
+document.getElementById('randPhotoBtn').onclick = ()=>{
+ photos.sort(()=>Math.random()-0.5);
+ idx = 0;
+ photoArea.style.display = 'block';
+ showPic();
+}
+document.getElementById('nextPhotoBtn').onclick = ()=>{
+ idx = (idx+1)%photos.length;
+ showPic();
+}
+closePhotoBtn.onclick = ()=>{
+ photoArea.style.display = 'none';
+}
+function showPic(){
+ box.innerHTML = `<img src="${photos[idx]}">`;
+ count.innerText = `${idx+1}/${photos.length}`;
+}
 
-    let currentLang = 'zh';
+ const langToggle = document.getElementById('langToggle');
+ const pageTitle = document.getElementById('pageTitle');
+ const links = document.querySelectorAll('.btn');
+ const secretBtn = document.getElementById('secretBtn');
+ const secretArea = document.getElementById('secretArea');
 
-    // 初始化语言
-    function applyLang(lang) {
-      currentLang = lang;
-      langToggle.textContent = lang === 'zh' ? 'EN' : 'ZH';
-      pageTitle.textContent = i18n[lang].pageTitle;
-      links.forEach(el => {
-        const key = el.getAttribute('data-i18n-key');
-        if (key && i18n[lang][key]) {
-          if (el.tagName === 'A') el.textContent = i18n[lang][key];
-          else if (el.tagName === 'BUTTON') el.textContent = i18n[lang][key];
-        }
-      });
-    }
+ let currentLang = 'zh';
 
-    // 切换语言
-    langToggle.addEventListener('click', () => {
-      applyLang(currentLang === 'zh' ? 'en' : 'zh');
-    });
+ // 初始化语言
+ function applyLang(lang) {
+ currentLang = lang;
+ langToggle.textContent = lang === 'zh'? 'EN' : 'ZH';
+ pageTitle.textContent = i18n[lang].pageTitle;
+ links.forEach(el => {
+ const key = el.getAttribute('data-i18n-key');
+ if (key && i18n[lang][key]) {
+ if (el.tagName === 'A') el.textContent = i18n[lang][key];
+ else if (el.tagName === 'BUTTON') el.textContent = i18n[lang][key];
+ }
+ });
+ }
 
-    // 密钥区域（Base64 混淆）
-    const encodedText = "YWlrZXkgZGU1NzFlNjdjYzA2NDI0ZWFkMzdhMGI3ZjhiODU1NWMuYXdsSmJPdGVsU2N2N3VzaQoKQUlNT0RFCgpHTE0tNC1GbGFzaC0yNTA0MTQKCmJhc2UgaHR0cAoKaHR0cHM6Ly9vcGVuLmJpZ21vZGVsLmNuL2FwaS9wYWFzL3Y0";
+ // 切换语言
+ langToggle.addEventListener('click', () => {
+ applyLang(currentLang === 'zh'? 'en' : 'zh');
+ });
 
-    // 密码多层混淆，完全不暴露明文
-    const passwordMask = [0x36, 0x37, 0x36, 0x37];
-    const realPwd = String.fromCharCode(...passwordMask);
+ // 密钥区域（Base64 混淆）
+ const encodedText = "YWlrZXkgZGU1NzFlNjdjYzA2NDI0ZWFkMzdhMGI3ZjhiODU1NWMuYXdsSmJPdGVsU2N2N3VzaQoKQUlNT0RFCgpHTE0tNC1GbGFzaC0yNTA0MTQKCmJhc2UgaHR0cAoKaHR0cHM6Ly9vcGVuLmJpZ21vZGVsLmNuL2FwaS9wYWFzL3Y0";
 
-    secretBtn.addEventListener('click', () => {
-      const pwd = prompt('请输入访问密码：', '');
-      if (pwd === realPwd) {
-        try {
-          secretArea.textContent = atob(encodedText);
-          secretArea.style.display = 'block';
-        } catch (e) {
-          secretArea.textContent = '[解码失败，请检查浏览器兼容性]';
-          secretArea.style.display = 'block';
-        }
-      } else {
-        alert('密码错误，请重试。');
-      }
-    });
+ // 密码多层混淆，完全不暴露明文
+ const passwordMask = [0x36, 0x37, 0x36, 0x37];
+ const realPwd = String.fromCharCode(...passwordMask);
 
-    // 首次加载应用中文
-    applyLang('zh');
-  </script>
-  <script>
+ secretBtn.addEventListener('click', () => {
+ const pwd = prompt('请输入访问密码：', '');
+ if (pwd === realPwd) {
+ try {
+ secretArea.textContent = atob(encodedText);
+ secretArea.style.display = 'block';
+ } catch (e) {
+ secretArea.textContent = '[解码失败，请检查浏览器兼容性]';
+ secretArea.style.display = 'block';
+ }
+ } else {
+ alert('密码错误，请重试。');
+ }
+ });
+
+ // 首次加载应用中文
+ applyLang('zh');
+ </script>
+ <script>
  document.getElementById('loadButton').addEventListener('click', function() {
-  var iframe = document.createElement('iframe');
-  iframe.style.width = '100%';
-  iframe.style.height = '100%';
-  iframe.src = 'long.html';
+ var iframe = document.createElement('iframe');
+ iframe.style.width = '100%';
+ iframe.style.height = '150%';
+ iframe.src = 'long.html';
 
-  var closeButton = document.createElement('button');
-  closeButton.textContent = '关闭';
-  closeButton.style.position = 'absolute';
-  closeButton.style.top = '10px';
-  closeButton.style.right = '10px';
-  closeButton.onclick = function() {
-    document.body.removeChild(iframe);
-    document.body.removeChild(closeButton);
-  };
+ var closeButton = document.createElement('button');
+ closeButton.textContent = '关闭';
+ closeButton.style.position = 'absolute';
+ closeButton.style.top = '10px';
+ closeButton.style.right = '10px';
+ closeButton.onclick = function() {
+ document.body.removeChild(iframe);
+ document.body.removeChild(closeButton);
+ };
 
-  document.body.appendChild(iframe);
-  document.body.appendChild(closeButton);
+ document.body.appendChild(iframe);
+ document.body.appendChild(closeButton);
 });
 </script>
 </body>
