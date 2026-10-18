@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+<title>Offline Runner</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #f7f7f7; font-family: monospace; }
+  body { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  canvas { width: 96vw; max-width: 800px; background: #fff; border-bottom: 2px solid #535353; touch-action: none; }
+  p { color: #777; font-size: 13px; text-align: center; margin: 12px; }
+</style>
+</head>
+<body>
+<canvas id="c" width="600" height="200"></canvas>
+<p>Space / ↑ / tap = jump &nbsp;·&nbsp; ↓ / hold bottom of screen = duck</p>
+<script>
+const cv = document.getElementById('c'), ctx = cv.getContext('2d');
+const W = 600, H = 200, GROUND = 160, INK = '#535353';
+let state = 'ready', speed, score, hi = 0, obstacles, clouds, frame, nextSpawn;
+const p = { x: 50, y: 0, vy: 0, w: 30, h: 40, ducking: false, onGround: true };
+
+try { hi = parseInt(localStorage.getItem('runner-hi')) || 0; } catch (e) {}
+
+function reset() {
+  speed = 5; score = 0; frame = 0; nextSpawn = 60;
+  obstacles = [];
+  clouds = [{ x: 150, y: 40 }, { x: 420, y: 65 }];
+  p.y = GROUND - 40; p.vy = 0; p.ducking = false; p.onGround = true;
+  state = 'running';
+}
+
+function jump() {
+  if (state !== 'running') { reset(); return; }
+  if (p.onGround) { p.vy = -11; p.onGround = false; }
+}
+
+function spawn() {
+  const r = Math.random();
+  if (score > 300 && r < 0.3) {
+    const high = Math.random() < 0.5;
+    obstacles.push({ type: 'drone', x: W + 20, y: high ? 108 : 138, w: 34, h: 18 });
+  } else {
+    const n = 1 + Math.floor(Math.random() * 3);
+    const h = 26 + Math.floor(Math.random() * 3) * 8;
+    obstacles.push({ type: 'crate', x: W + 20, y: GROUND - h, w: 20 * n, h, n });
+  }
+  nextSpawn = 50 + Math.random() * 60 + (12 - speed) * 4;
+}
+
+function hitbox() {
+  const h = p.ducking && p.onGround ? 24 : p.h;
+  return { x: p.x + 4, y: p.y + (p.h - h) + 4, w: p.w - 8, h: h - 8 };
+}
+
+function update() {
+  if (state !== 'running') return;
+  frame++;
+  score += speed * 0.1;
+  speed = Math.min(13, 5 + score / 250);
+
+  p.vy += 0.6; p.y += p.vy;
+  if (p.y >= GROUND - p.h) { p.y = GROUND - p.h; p.vy = 0; p.onGround = true; }
+
+  nextSpawn--;
+  if (nextSpawn <= 0) spawn();
+
+  obstacles.forEach(o => o.x -= speed + (o.type === 'drone' ? 1.5 : 0));
+  obstacles = obstacles.filter(o => o.x + o.w > -10);
+  clouds.forEach(c => { c.x -= 0.5; if (c.x < -40) { c.x = W + 40; c.y = 25 + Math.random() * 50; } });
+
+  const b = hitbox();
+  for (const o of obstacles) {
+    if (b.x < o.x + o.w - 3 && b.x + b.w > o.x + 3 && b.y < o.y + o.h - 3 && b.y + b.h > o.y + 3) {
+      state = 'over';
+      const s = Math.floor(score);
+      if (s > hi) { hi = s; try { localStorage.setItem('runner-hi', hi); } catch (e) {} }
+    }
+  }
+}
+
+function drawPlayer() {
+  const duck = p.ducking && p.onGround;
+  const h = duck ? 24 : p.h, top = p.y + (p.h - h), x = p.x;
+  ctx.fillStyle = INK;
+  ctx.fillRect(x, top, p.w, h - 8);               // body
+  ctx.fillRect(x + 12, top - 6, 2, 6);            // antenna
+  ctx.fillRect(x + 10, top - 9, 6, 3);
+  ctx.fillStyle = '#fff';
+  ctx.fillRect(x + 18, top + 5, 8, 6);            // visor
+  ctx.fillStyle = INK;
+  ctx.fillRect(x + 21, top + 7, 3, 3);            // eye
+  // legs
+  const step = p.onGround && Math.floor(frame / 5) % 2;
+  ctx.fillRect(x + 5, top + h - 8, 6, 8 - (step ? 3 : 0));
+  ctx.fillRect(x + 19, top + h - 8, 6, 8 - (step ? 0 : 3));
+}
+
+function drawObstacle(o) {
+  ctx.fillStyle = INK;
+  if (o.type === 'crate') {
+    for (let i = 0; i < o.n; i++) {
+      ctx.strokeStyle = INK; ctx.lineWidth = 2;
+      ctx.strokeRect(o.x + i * 20 + 1, o.y + 1, 18, o.h - 2);
+      ctx.beginPath();
+      ctx.moveTo(o.x + i * 20 + 1, o.y + 1); ctx.lineTo(o.x + i * 20 + 19, o.y + o.h - 1);
+      ctx.moveTo(o.x + i * 20 + 19, o.y + 1); ctx.lineTo(o.x + i * 20 + 1, o.y + o.h - 1);
+      ctx.stroke();
+    }
+  } else {
+    ctx.fillRect(o.x + 8, o.y + 6, 18, 10);       // pod
+    const up = Math.floor(frame / 6) % 2;
+    ctx.fillRect(o.x, o.y + (up ? 0 : 8), 34, 3); // rotor
+    ctx.fillRect(o.x + 16, o.y + 2, 2, 5);
+    ctx.fillRect(o.x + 12, o.y + 16, 10, 2);
+  }
+}
+
+function draw() {
+  ctx.clearRect(0, 0, W, H);
+  ctx.fillStyle = '#ddd';
+  clouds.forEach(c => { ctx.fillRect(c.x, c.y, 40, 8); ctx.fillRect(c.x + 8, c.y - 6, 24, 6); });
+
+  ctx.fillStyle = INK;
+  ctx.fillRect(0, GROUND, W, 2);
+  for (let i = 0; i < 12; i++) {
+    const gx = ((i * 57 - frame * speed * 0.8) % W + W) % W;
+    ctx.fillRect(gx, GROUND + 8, 6 + (i % 3) * 3, 2);
+  }
+
+  obstacles.forEach(drawObstacle);
+  drawPlayer();
+
+  ctx.fillStyle = INK; ctx.font = '16px monospace'; ctx.textAlign = 'right';
+  ctx.fillText('HI ' + String(hi).padStart(5, '0') + '  ' + String(Math.floor(score)).padStart(5, '0'), W - 12, 24);
+
+  ctx.textAlign = 'center';
+  if (state === 'ready') ctx.fillText('Press Space or tap to start', W / 2, 90);
+  if (state === 'over') {
+    ctx.font = '24px monospace'; ctx.fillText('G A M E   O V E R', W / 2, 80);
+    ctx.font = '14px monospace'; ctx.fillText('Press Space or tap to restart', W / 2, 105);
+  }
+}
+
+function loop() { update(); draw(); requestAnimationFrame(loop); }
+
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' || e.code === 'ArrowUp') { e.preventDefault(); if (!e.repeat) jump(); }
+  if (e.code === 'ArrowDown') { e.preventDefault(); p.ducking = true; if (!p.onGround) p.vy += 3; }
+});
+document.addEventListener('keyup', e => { if (e.code === 'ArrowDown') p.ducking = false; });
+
+cv.addEventListener('pointerdown', e => {
+  const r = cv.getBoundingClientRect();
+  if ((e.clientY - r.top) / r.height > 0.7 && state === 'running') p.ducking = true; else jump();
+});
+window.addEventListener('pointerup', () => { p.ducking = false; });
+
+reset(); state = 'ready';
+loop();
+</script>
+</body>
+</html>
