@@ -22,9 +22,22 @@
     color: var(--text);
     background: var(--bg) url("background.jpg") center / cover fixed no-repeat;
   }
+  body.introing { overflow: hidden; }
   main { max-width: 800px; margin: 0 auto; padding: 24px 16px 48px; }
   header { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  h1 { flex: 1; text-align: center; margin: 16px 0; font-size: clamp(20px, 5vw, 28px); }
+  h1 {
+    flex: 1; text-align: center; margin: 14px 0; line-height: 1.2;
+    font-family: "STXinwei", "STKaiti", "KaiTi", "Microsoft YaHei", "Arial Black", system-ui, sans-serif;
+    font-size: clamp(28px, 7.5vw, 52px); font-weight: 900; letter-spacing: .08em;
+    background: linear-gradient(100deg, #1f56b3 0%, #2f6fcb 35%, #00b4ff 65%, #1f56b3 100%) 0 0 / 220% 100%;
+    -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 2px 0 rgba(255,255,255,.8)) drop-shadow(0 4px 10px rgba(47,111,203,.45));
+    animation: titleShine 6s linear infinite;
+  }
+  @keyframes titleShine { to { background-position: -220% 0; } }
+  @media (prefers-reduced-motion: reduce) { h1 { animation: none; } }
+  .welcome { text-align: center; margin: 0; color: var(--muted); font-size: 14px; }
+  .welcome[hidden] { display: none; }
   button, .btn { font: inherit; }
   .btn {
     display: block; padding: 12px; text-align: center; border: 0; border-radius: 8px;
@@ -56,15 +69,163 @@
   dialog { width: min(860px, 96vw); height: min(90vh, 360px); padding: 0; border: 0; border-radius: 8px; overflow: hidden; }
   dialog::backdrop { background: rgba(0,0,0,.5); }
   dialog iframe { width: 100%; height: 100%; border: 0; display: block; }
+
+  /* =====================  开场（Intro）  ===================== */
+  .intro {
+    --bw: clamp(150px, 21vw, 240px);
+    --blue: #2f6fcb; --ink: #2a5db0; --px: 0px; --py: 0px;
+    position: fixed; inset: 0; z-index: 1000; display: block; overflow: hidden;
+    color: var(--ink); font-family: "Microsoft YaHei", system-ui, sans-serif;
+    background: linear-gradient(180deg, #e4ebf6 0%, #cfdaed 100%);
+    transition: opacity .6s ease;
+  }
+  .intro[hidden] { display: none; }
+  .intro.leaving { opacity: 0; pointer-events: none; }
+  .intro button { font: inherit; }
+
+  /* 背景：交叉光带 + 细线框 + 角标 */
+  .bg-x { position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+          translate: calc(var(--px) * -.6) calc(var(--py) * -.6); }
+  .bg-x::before, .bg-x::after {
+    content: ""; position: absolute; left: 50%; top: 50%; width: 170vmax; height: 26vmax;
+    background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.45), rgba(255,255,255,0));
+  }
+  .bg-x::before { translate: -50% -50%; rotate: 32deg; }
+  .bg-x::after  { translate: -50% -50%; rotate: -32deg; }
+  .frame { position: absolute; inset: 0; pointer-events: none; }
+  .frame::before, .frame::after {
+    content: ""; position: absolute; top: 8%; bottom: 8%; width: 1px;
+    background: repeating-linear-gradient(180deg, rgba(90,125,185,.4) 0 6px, transparent 6px 12px);
+  }
+  .frame::before { left: 7%; } .frame::after { right: 7%; }
+  .cross { position: absolute; width: 14px; height: 14px; opacity: .55; pointer-events: none;
+    background: linear-gradient(#5a7db9,#5a7db9) center/100% 1px no-repeat, linear-gradient(#5a7db9,#5a7db9) center/1px 100% no-repeat; }
+  .cross.tl { left: 4%; top: 5%; } .cross.br { right: 4%; bottom: 5%; }
+  .tag { position: absolute; font: 10px/1.5 Consolas, monospace; letter-spacing: .14em; color: rgba(70,105,165,.65); pointer-events: none; }
+  .tag.tl { left: 4%; top: 8%; } .tag.br { right: 4%; bottom: 8%; text-align: right; }
+
+  .codefall { position: absolute; left: 4%; top: 0; bottom: 0; width: 22%; overflow: hidden; pointer-events: none;
+    opacity: 0; transition: opacity 1s;
+    -webkit-mask-image: linear-gradient(180deg, transparent, #000 15%, #000 85%, transparent);
+            mask-image: linear-gradient(180deg, transparent, #000 15%, #000 85%, transparent); }
+  .s-load .codefall, .s-login .codefall { opacity: .45; }
+  .codefall pre { margin: 0; font: 9px/1.8 Consolas, monospace; color: #8499bd; animation: cf 70s linear infinite; }
+  @keyframes cf { to { transform: translateY(-50%); } }
+
+  .tools { position: absolute; top: 14px; right: 14px; display: flex; gap: 8px; z-index: 5; }
+  .chip { font-size: 13px; padding: 6px 12px; border: 1px solid rgba(60,100,170,.45); background: rgba(255,255,255,.6);
+          color: var(--ink); border-radius: 4px; cursor: pointer; }
+  .chip:hover { background: #fff; }
+  .intro :focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+
+  /* 标志（原创图形）*/
+  .brand {
+    position: absolute; left: 27%; top: 50%; width: var(--bw); transform: translate(-50%, -50%);
+    translate: var(--px) var(--py); text-align: center; cursor: pointer; opacity: 0; user-select: none;
+    transition: opacity .6s, left .9s cubic-bezier(.3,.7,.2,1), top .9s cubic-bezier(.3,.7,.2,1);
+  }
+  .brand.show { opacity: 1; }
+  .s-ok .brand { left: 50%; }
+  .emblem { display: block; width: 100%; height: auto; overflow: visible; --spread: 70; }
+  .emblem.built { --spread: 3; }
+  .piece {
+    transform: translate(calc(var(--ox) * var(--spread) * 1px), calc(var(--oy) * var(--spread) * 1px));
+    opacity: 0; transition: transform .7s cubic-bezier(.2,.9,.25,1), opacity .6s;
+  }
+  .emblem.built .piece { opacity: 1; }
+  .ghost { fill: rgba(110,155,225,.38); opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .emblem.built .ghost { animation: ghost 3.2s ease-in-out infinite; }
+  @keyframes ghost { 0%,100% { opacity: .25; transform: scale(.96); } 50% { opacity: .9; transform: scale(1.04); } }
+  .core { fill: #eef4fc; stroke: var(--blue); stroke-width: 2; transform-box: fill-box; transform-origin: center; opacity: 0; transition: opacity .6s .5s; }
+  .emblem.built .core { opacity: 1; animation: coreSpin 6s ease-in-out infinite; }
+  @keyframes coreSpin { 0%,100% { rotate: 0deg; } 50% { rotate: 90deg; } }
+  .wordmark {
+    margin-top: 14px; display: flex; justify-content: center; color: var(--blue); padding-left: .14em;
+    font: 900 clamp(26px, 3.6vw, 44px)/1 "Arial Black", Impact, "Microsoft YaHei", sans-serif; letter-spacing: .14em;
+  }
+  .wordmark span { opacity: 0; transform: translateY(8px); transition: opacity .5s, transform .5s; transition-delay: calc(var(--i) * 70ms + 500ms); }
+  .brand.show .wordmark span { opacity: 1; transform: none; }
+  .ripple { position: absolute; left: 50%; top: calc(var(--bw) / 2); width: var(--bw); height: var(--bw);
+    margin: calc(var(--bw) / -2) 0 0 calc(var(--bw) / -2); border: 2px solid rgba(47,111,203,.6); border-radius: 50%;
+    animation: rip .7s ease-out forwards; pointer-events: none; }
+  @keyframes rip { from { transform: scale(.4); opacity: .9; } to { transform: scale(1.7); opacity: 0; } }
+
+  /* 右侧面板 */
+  .panel {
+    position: absolute; left: 56%; top: 50%; width: min(380px, 34vw); height: 340px; transform: translateY(-50%);
+    opacity: 0; visibility: hidden; transition: opacity .5s, visibility 0s .5s;
+  }
+  .s-load .panel, .s-login .panel { opacity: 1; visibility: visible; transition: opacity .5s; }
+  .panel-title { display: flex; align-items: center; gap: 12px; margin: 0 0 22px; font-size: 15px; font-weight: 700; white-space: nowrap; }
+  .panel-title i { flex: 1; height: 1px; background: linear-gradient(90deg, transparent, #6a95d8); }
+  .panel-title i:last-child { transform: scaleX(-1); }
+  .pbody { position: relative; height: 290px; }
+
+  .boot { position: absolute; inset: 0; list-style: none; margin: 0; padding: 0; font-size: 14px; opacity: 0; visibility: hidden; transition: opacity .45s, visibility 0s .45s; }
+  .s-load .boot { opacity: 1; visibility: visible; transition: opacity .45s; }
+  .boot li { display: flex; align-items: center; gap: 12px; height: 30px; opacity: 0; transform: translateX(-10px); transition: opacity .35s, transform .35s; }
+  .boot li.in { opacity: 1; transform: none; }
+  .dot { flex: none; width: 11px; height: 11px; border-radius: 50%; border: 2px solid #a9c3ee; border-top-color: var(--blue); animation: spin .8s linear infinite; }
+  .boot li.done .dot { width: 0; height: 0; border-radius: 0; border-width: 5px 0 5px 8px; border-color: transparent transparent transparent var(--blue); animation: none; margin-right: 3px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .login { position: absolute; inset: 0; display: flex; flex-direction: column; opacity: 0; visibility: hidden; transition: opacity .45s, visibility 0s .45s; }
+  .s-login .login { opacity: 1; visibility: visible; transition: opacity .45s .15s; }
+  .login label { font-size: 13px; font-weight: 700; margin: 0 0 6px; color: #27456f; }
+  .field { position: relative; background: rgba(255,255,255,.55); border: 1px solid #6a95d8; border-radius: 2px; margin-bottom: 16px; transition: box-shadow .2s, background .2s; }
+  .field:focus-within { background: #fff; box-shadow: 0 0 0 2px rgba(47,111,203,.25); }
+  .field input { display: block; width: 100%; border: 0; background: transparent; font: inherit; font-size: 15px; color: #27456f; padding: 10px 40px 2px 12px; outline: none; }
+  .field small { display: block; padding: 0 12px 8px; font-size: 11px; color: #7a8fb0; }
+  .field.plain input { padding: 14px 64px 14px 12px; }
+  .check { position: absolute; right: 12px; top: 50%; translate: 0 -50%; width: 18px; height: 18px; opacity: 0; transition: opacity .2s; }
+  .field.has .check { opacity: 1; }
+  .pwt { position: absolute; right: 6px; top: 50%; translate: 0 -50%; border: 0; background: none; color: var(--ink); font-size: 12px; padding: 6px; cursor: pointer; }
+  .enter { position: relative; overflow: hidden; margin-top: 10px; height: 42px; border: 0; border-radius: 2px; background: #5b83cf; color: #fff;
+           font-size: 15px; font-weight: 700; letter-spacing: .1em; cursor: pointer; }
+  .enter:hover:not(:disabled) { background: #4f78c6; }
+  .enter .fill { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: #2e66c2; }
+  .enter span { position: relative; }
+  .hint { margin: 10px 0 0; font-size: 12px; color: #6a7fa3; text-align: center; min-height: 1.4em; }
+  .hint.err { color: #c0392b; font-weight: 700; }
+  .field.admin { border-color: #b8860b; }
+  .field.admin small { color: #9a6d00; font-weight: 700; }
+  .field.shake { animation: shake .4s; }
+  @keyframes shake { 20%,60% { translate: -6px 0; } 40%,80% { translate: 6px 0; } }
+
+  /* 接入成功 */
+  .ok { position: absolute; left: 0; right: 0; top: 50%; pointer-events: none; opacity: 0; visibility: hidden; transition: opacity .4s, visibility 0s .4s; }
+  .s-ok .ok { opacity: 1; visibility: visible; transition: opacity .4s .3s; }
+  .welcome-row { position: absolute; left: 0; right: 0; top: 0; translate: 0 -50%; display: flex; justify-content: center; gap: calc(var(--bw) + 40px);
+                 font: 12px Arial, sans-serif; color: #5a7db9; }
+  .welcome-row div { display: flex; gap: 4.5vw; }
+  .welcome-row span { opacity: 0; transition: opacity .5s; transition-delay: calc(var(--i) * 120ms + 600ms); }
+  .s-ok .welcome-row span { opacity: 1; }
+  .status { position: absolute; left: 50%; top: calc((var(--bw) + 58px) / 2 + 18px); translate: -50% 0; display: flex; align-items: center; gap: 14px;
+            font-size: 14px; white-space: nowrap; opacity: 0; transition: opacity .5s 1s; }
+  .s-ok .status { opacity: 1; }
+  .status i { width: 36px; height: 1px; background: #6a95d8; }
+
+  @media (max-width: 760px) {
+    .brand { left: 50%; top: 24%; }
+    .s-ok .brand { top: 50%; }
+    .panel { left: 50%; top: 62%; width: min(86vw, 380px); transform: translate(-50%, -50%); }
+    .codefall, .tag { display: none; }
+    .welcome-row { gap: calc(var(--bw) + 28px); font-size: 11px; }
+    .welcome-row div { gap: 3vw; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .intro *, .intro *::before, .intro *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; transition-delay: 0s !important; }
+  }
 </style>
 </head>
 <body>
-<main>
+<main id="mainEl">
   <header>
     <span style="width:48px" aria-hidden="true"></span>
     <h1 id="pageTitle" data-i18n="title">数据删除killer导航页</h1>
     <button id="langToggle" class="lang" type="button" aria-label="Switch language">EN</button>
   </header>
+  <p class="welcome" id="welcome" hidden></p>
 
   <nav class="grid" aria-label="Links">
     <a class="btn" href="https://www.baidu.com" target="_blank" rel="noopener noreferrer" data-i18n="baidu">百度</a>
@@ -94,6 +255,63 @@
   <button class="close" id="closeGame" type="button" data-i18n="close">关闭</button>
 </dialog>
 
+<!-- 开场：标志浮现 → 终端加载 → 访客登录 → 接入成功 -->
+<div id="intro" class="intro s-boot" role="dialog" aria-modal="true" aria-label="Intro" hidden>
+  <div class="bg-x"></div>
+  <div class="frame"></div>
+  <span class="cross tl"></span><span class="cross br"></span>
+  <span class="tag tl">SYS // GUEST-CHANNEL</span>
+  <span class="tag br">NODE 0x3F2A<br>STATUS: STANDBY</span>
+  <div class="codefall" id="codefall" aria-hidden="true"></div>
+
+  <div class="tools">
+    <button class="chip" id="introLang" type="button" aria-label="Switch language">EN</button>
+  </div>
+
+  <div class="brand" id="brand">
+    <svg class="emblem" id="emblem" viewBox="-10 -10 220 220" aria-hidden="true">
+      <polygon class="ghost" points="100,-8 208,100 100,208 -8,100"/>
+      <g class="piece" style="--ox:1;--oy:-1"><polygon points="100,10 190,100 100,100" fill="#2f6fcb"/><polygon points="100,10 100,100 145,55" fill="#fff" opacity=".16"/></g>
+      <g class="piece" style="--ox:1;--oy:1"><polygon points="190,100 100,190 100,100" fill="#1f56b3"/><polygon points="190,100 100,100 145,145" fill="#fff" opacity=".14"/></g>
+      <g class="piece" style="--ox:-1;--oy:1"><polygon points="100,190 10,100 100,100" fill="#2f6fcb"/><polygon points="100,190 100,100 55,145" fill="#fff" opacity=".16"/></g>
+      <g class="piece" style="--ox:-1;--oy:-1"><polygon points="10,100 100,10 100,100" fill="#3f82e0"/><polygon points="10,100 100,100 55,55" fill="#fff" opacity=".14"/></g>
+      <polygon class="core" points="100,78 122,100 100,122 78,100"/>
+    </svg>
+    <div class="wordmark" aria-hidden="true"><span style="--i:0">K</span><span style="--i:1">I</span><span style="--i:2">L</span><span style="--i:3">L</span><span style="--i:4">E</span><span style="--i:5">R</span></div>
+  </div>
+
+  <section class="panel" id="panel">
+    <h2 class="panel-title"><i></i><span data-i18n="termTitle">访客接入终端</span><i></i></h2>
+    <div class="pbody">
+      <ul class="boot" id="bootList" aria-live="polite"></ul>
+
+      <form class="login" id="loginForm" autocomplete="off">
+        <label for="accName" data-i18n="account">访客账号</label>
+        <div class="field has" id="nameField">
+          <input id="accName" type="text" maxlength="20" spellcheck="false" autocomplete="off">
+          <small id="roleText"></small>
+          <svg class="check" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 10.5l4.5 4.5L17 5" fill="none" stroke="#2a3f63" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <label for="accPw" data-i18n="password">密码</label>
+        <div class="field plain">
+          <input id="accPw" type="password" autocomplete="new-password">
+          <button class="pwt" id="pwToggle" type="button"></button>
+        </div>
+        <button class="enter" id="enterBtn" type="submit"><i class="fill" id="enterFill"></i><span data-i18n="enter">进入导航</span></button>
+        <p class="hint" id="hintText" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
+
+  <div class="ok" id="okBox" aria-live="polite">
+    <div class="welcome-row" aria-hidden="true">
+      <div><span style="--i:0">W</span><span style="--i:1">E</span><span style="--i:2">L</span><span style="--i:3">C</span></div>
+      <div><span style="--i:4">O</span><span style="--i:5">M</span><span style="--i:6">E</span></div>
+    </div>
+    <div class="status"><i></i><span><span data-i18n="okStatus">接入成功</span> · <b id="okName"></b></span><i></i></div>
+  </div>
+</div>
+
 <script>
 (() => {
   const $ = id => document.getElementById(id);
@@ -102,24 +320,73 @@
   const i18n = {
     zh: { title: "数据删除killer导航页", baidu: "百度", bilibili: "B站", outlook: "Outlook邮箱",
           mybilibili: "我的b站空间", github: "我的GitHub", photos: "骇爪美图", game: "别笑，你也过不了第二关",
-          prev: "上一张", next: "下一张", close: "关闭", alt: "图片" },
+          prev: "上一张", next: "下一张", close: "关闭", alt: "图片",
+          termTitle: "访客接入终端", b1: "正在建立访客通道", b2: "正在加载页面资源", b3: "正在检查浏览器兼容性",
+          b4: "正在生成访客身份", b5: "初始化完成，请登录", account: "访客账号", role: "访客权限",
+          password: "密码", pwShow: "显示", pwHide: "隐藏", enter: "进入导航", hint: "访客无需密码，可留空",
+          roleAdmin: "管理员权限", hintAdmin: "管理员账号请输入密码", errPw: "密码错误，请重试",
+          okStatus: "接入成功", greet: "欢迎，{n}", greetAdmin: "欢迎，管理员 {n}", defaultName: "未知访客" },
     en: { title: "Data Deletion Killer — Quick Links", baidu: "Baidu", bilibili: "Bilibili", outlook: "Outlook Email",
           mybilibili: "My Bilibili", github: "My GitHub", photos: "Photo Gallery", game: "Don't laugh, you can't pass level two",
-          prev: "Previous", next: "Next", close: "Close", alt: "Photo" }
+          prev: "Previous", next: "Next", close: "Close", alt: "Photo",
+          termTitle: "Visitor Access Terminal", b1: "Opening visitor channel", b2: "Loading page resources", b3: "Checking browser compatibility",
+          b4: "Generating visitor identity", b5: "Ready — please sign in", account: "Visitor account", role: "Guest access",
+          password: "Password", pwShow: "Show", pwHide: "Hide", enter: "Enter", hint: "No password needed — leave it blank",
+          roleAdmin: "Administrator access", hintAdmin: "Administrator account — enter the password", errPw: "Wrong password, try again",
+          okStatus: "Access granted", greet: "Welcome, {n}", greetAdmin: "Welcome, administrator {n}", defaultName: "Unknown Visitor" }
   };
   let lang = "zh";
   try { lang = localStorage.getItem("lang") || (navigator.language.startsWith("zh") ? "zh" : "en"); } catch (e) {}
+  const t = k => i18n[lang][k];
+
+  /* ---------- 开场状态 ---------- */
+  const intro = $("intro"), mainEl = $("mainEl"), brand = $("brand"), emblem = $("emblem");
+  const nameInput = $("accName"), pwInput = $("accPw"), nameField = $("nameField");
+  let active = false, submitting = false, nameEdited = false, introDone = false, waiters = [];
+  const RM = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const speed = RM ? 0.001 : 1;
+
+  const ADMIN_NAME = "killer", ADMIN_PW = "6767";   // 内置账号（仅装饰，无实际权限）
+  const getName = () => nameInput.value.trim() || t("defaultName");
+  const isAdmin = () => nameInput.value.trim().toLowerCase() === ADMIN_NAME;
+
+  function updateRole() {
+    const admin = isAdmin();
+    $("roleText").textContent = admin ? t("roleAdmin") : t("role");
+    nameField.classList.toggle("admin", admin);
+    const hint = $("hintText");
+    hint.classList.remove("err");
+    hint.textContent = admin ? t("hintAdmin") : t("hint");
+  }
+
+  function updateGreeting() {
+    if (!introDone) return;
+    const w = $("welcome");
+    w.textContent = t(isAdmin() ? "greetAdmin" : "greet").replace("{n}", getName());
+    w.hidden = false;
+  }
 
   function applyLang(l) {
     lang = i18n[l] ? l : "zh";
     document.documentElement.lang = lang === "zh" ? "zh-CN" : "en";
     document.querySelectorAll("[data-i18n]").forEach(el => { el.textContent = i18n[lang][el.dataset.i18n]; });
-    $("langToggle").textContent = lang === "zh" ? "EN" : "中文";
+    const toggle = lang === "zh" ? "EN" : "中文";
+    $("langToggle").textContent = toggle;
+    $("introLang").textContent = toggle;
     document.title = lang === "zh" ? "极简导航" : "Minimal Navigation";
+    if (!nameEdited) nameInput.value = t("defaultName");
+    nameField.classList.toggle("has", !!nameInput.value.trim());
+    $("pwToggle").textContent = pwInput.type === "password" ? t("pwShow") : t("pwHide");
+    document.querySelectorAll("#bootList li").forEach(li => { li.querySelector("span").textContent = t(li.dataset.k); });
+    $("okName").textContent = getName();
+    updateRole();
+    updateGreeting();
     if (!$("gallery").hidden) showPic();
     try { localStorage.setItem("lang", lang); } catch (e) {}
   }
-  $("langToggle").addEventListener("click", () => applyLang(lang === "zh" ? "en" : "zh"));
+  const toggleLang = () => applyLang(lang === "zh" ? "en" : "zh");
+  $("langToggle").addEventListener("click", toggleLang);
+  $("introLang").addEventListener("click", toggleLang);
 
   /* ---------- Gallery ---------- */
   const PHOTOS = ["1.jpg", "2.jpg", "3.jpg", "4.jpg", "5.jpg", "6.jpeg", "7.jpeg"];
@@ -136,10 +403,9 @@
   function showPic() {
     const img = new Image();
     img.src = order[idx];
-    img.alt = `${i18n[lang].alt} ${idx + 1}`;
+    img.alt = `${t("alt")} ${idx + 1}`;
     $("photoBox").replaceChildren(img);
     $("photoCount").textContent = `${idx + 1}/${order.length}`;
-    // preload next image
     new Image().src = order[(idx + 1) % order.length];
   }
   function step(d) { idx = (idx + d + order.length) % order.length; showPic(); }
@@ -155,13 +421,12 @@
   $("closePhoto").addEventListener("click", () => { $("gallery").hidden = true; });
 
   document.addEventListener("keydown", e => {
-    if ($("gallery").hidden || $("gameDialog").open) return;
+    if (active || $("gallery").hidden || $("gameDialog").open) return;
     if (e.key === "ArrowRight") step(1);
     else if (e.key === "ArrowLeft") step(-1);
     else if (e.key === "Escape") $("gallery").hidden = true;
   });
 
-  // Swipe support
   let touchX = null;
   $("photoBox").addEventListener("touchstart", e => { touchX = e.touches[0].clientX; }, { passive: true });
   $("photoBox").addEventListener("touchend", e => {
@@ -171,7 +436,7 @@
     touchX = null;
   });
 
-  /* ---------- Game (loaded only when opened, removed when closed) ---------- */
+  /* ---------- Game ---------- */
   const dlg = $("gameDialog");
   $("gameBtn").addEventListener("click", () => {
     const f = document.createElement("iframe");
@@ -181,11 +446,163 @@
     dlg.showModal();
     f.addEventListener("load", () => f.focus());
   });
-  const closeGame = () => { dlg.close(); };
-  $("closeGame").addEventListener("click", closeGame);
+  $("closeGame").addEventListener("click", () => dlg.close());
   dlg.addEventListener("close", () => dlg.querySelector("iframe")?.remove());
 
+  /* =====================  开场逻辑  ===================== */
+  // 可被「跳过」打断的等待
+  function wait(ms) {
+    return new Promise(res => {
+      const id = setTimeout(done, ms * speed);
+      function done() { clearTimeout(id); waiters = waiters.filter(w => w !== done); res(); }
+      waiters.push(done);
+    });
+  }
+  const flushWaiters = () => waiters.slice().forEach(w => w());
+  const stage = s => { intro.classList.remove("s-boot", "s-load", "s-login", "s-ok"); intro.classList.add(s); };
+
+  // 背景「代码雨」装饰
+  (function buildCode() {
+    const snip = ["const visitor = await connect();", "if (!session.ok) retry(3);", "fetch('/handshake')", "status: 'guest', level: 0",
+      "for (const p of pages) preload(p);", "document.body.dataset.mode = 'guest';", "// init channel #0x3F2A",
+      "return render(view, state);", "emit('ready', { t: Date.now() });", "window.addEventListener('load', boot);", "  token = hash(seed ^ 0x9e37);", "}"];
+    let s = "";
+    for (let i = 0; i < 70; i++) s += snip[Math.floor(Math.random() * snip.length)] + "\n";
+    const pre = document.createElement("pre");
+    pre.textContent = s + s;
+    $("codefall").appendChild(pre);
+  })();
+
+  function preload() {
+    return Promise.all(["background.jpg", ...PHOTOS].map(u => new Promise(r => {
+      const i = new Image(); i.onload = i.onerror = () => r(); i.src = u;
+    })));
+  }
+
+  function addBootLine(k) {
+    const li = document.createElement("li");
+    li.dataset.k = k;
+    li.innerHTML = '<i class="dot"></i><span></span>';
+    li.querySelector("span").textContent = t(k);
+    $("bootList").appendChild(li);
+    requestAnimationFrame(() => requestAnimationFrame(() => li.classList.add("in")));
+    return li;
+  }
+
+  function resetIntro() {
+    $("bootList").replaceChildren();
+    emblem.classList.remove("built"); emblem.style.removeProperty("--spread");
+    brand.classList.remove("show");
+    pwInput.value = ""; pwInput.type = "password"; pwInput.disabled = false; nameInput.disabled = false;
+    $("enterBtn").disabled = false;
+    const fill = $("enterFill"); fill.style.transition = "none"; fill.style.width = "0";
+    $("pwToggle").textContent = t("pwShow");
+    if (!nameEdited) nameInput.value = t("defaultName");
+    nameField.classList.toggle("has", !!nameInput.value.trim());
+  }
+
+  async function runIntro() {
+    flushWaiters();
+    active = true; submitting = false; introDone = false;
+    $("welcome").hidden = true;
+    intro.hidden = false; intro.classList.remove("leaving");
+    mainEl.inert = true; document.body.classList.add("introing");
+    resetIntro(); stage("s-boot");
+
+    await wait(300); if (!active) return;
+    emblem.classList.add("built"); brand.classList.add("show");
+    await wait(1200); if (!active) return;
+
+    stage("s-load");
+    const pre = preload();
+    const lines = [["b1", 650], ["b2", 700, true], ["b3", 600], ["b4", 650], ["b5", 350]];
+    for (const [k, ms, needsAssets] of lines) {
+      const li = addBootLine(k);
+      await wait(ms); if (!active) return;
+      if (needsAssets) { await Promise.race([pre, wait(2500)]); if (!active) return; }
+      li.classList.add("done");
+      await wait(150); if (!active) return;
+    }
+    await wait(450); if (!active) return;
+    showLogin();
+  }
+
+  function showLogin() {
+    stage("s-login");
+    setTimeout(() => { if (active && intro.classList.contains("s-login")) pwInput.focus({ preventScroll: true }); }, 650 * speed + 30);
+  }
+
+  async function success() {
+    $("okName").textContent = getName();
+    stage("s-ok");
+    await wait(2300); if (!active) return;
+    finish();
+  }
+
+  function finish() {
+    if (!active) return;
+    active = false; introDone = true; flushWaiters();
+    updateGreeting();
+    intro.classList.add("leaving");
+    mainEl.inert = false; document.body.classList.remove("introing");
+    setTimeout(() => { if (!active) { intro.hidden = true; intro.classList.remove("leaving"); } }, 650);
+  }
+
+  /* ----- 交互 ----- */
+  // 开场不可跳过：没有跳过按钮，也不响应 Esc
+  nameInput.addEventListener("input", () => { nameEdited = true; nameField.classList.toggle("has", !!nameInput.value.trim()); updateRole(); kick(7); });
+  nameInput.addEventListener("focus", () => nameInput.select());
+  pwInput.addEventListener("input", () => { kick(7); if ($("hintText").classList.contains("err")) updateRole(); });
+  $("pwToggle").addEventListener("click", () => {
+    pwInput.type = pwInput.type === "password" ? "text" : "password";
+    $("pwToggle").textContent = pwInput.type === "password" ? t("pwShow") : t("pwHide");
+    pwInput.focus();
+  });
+
+  $("loginForm").addEventListener("submit", async e => {
+    e.preventDefault();
+    if (!active || submitting) return;
+    if (isAdmin() && pwInput.value !== ADMIN_PW) {          // 管理员账号需要正确密码
+      const hint = $("hintText");
+      hint.textContent = t("errPw"); hint.classList.add("err");
+      nameField.classList.remove("shake"); void nameField.offsetWidth; nameField.classList.add("shake");
+      pwInput.select(); kick(14);
+      return;
+    }
+    submitting = true;
+    nameInput.disabled = pwInput.disabled = $("enterBtn").disabled = true;
+    const fill = $("enterFill");
+    fill.style.transition = `width ${1100 * speed}ms linear`;
+    fill.style.width = "100%";
+    await wait(1200); if (!active) return;
+    success();
+  });
+
+  // 点击标志：涟漪 + 碎片弹开
+  let kickT;
+  function kick(n) {
+    emblem.style.setProperty("--spread", n);
+    clearTimeout(kickT);
+    kickT = setTimeout(() => emblem.style.removeProperty("--spread"), 150);
+  }
+  brand.addEventListener("pointerdown", () => {
+    const r = document.createElement("span");
+    r.className = "ripple";
+    brand.appendChild(r);
+    setTimeout(() => r.remove(), 750);
+    kick(16);
+  });
+
+  // 鼠标视差
+  intro.addEventListener("pointermove", e => {
+    if (RM) return;
+    const x = e.clientX / innerWidth - .5, y = e.clientY / innerHeight - .5;
+    intro.style.setProperty("--px", (x * 16).toFixed(1) + "px");
+    intro.style.setProperty("--py", (y * 12).toFixed(1) + "px");
+  });
+
   applyLang(lang);
+  runIntro();
 })();
 </script>
 </body>
