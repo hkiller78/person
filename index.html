@@ -53,6 +53,10 @@
     padding: 6px 12px; font-size: 14px; background: var(--card); color: var(--text);
     border: 1px solid #bdc3c7; border-radius: 4px; cursor: pointer;
   }
+  #routeBtn::after { content: " ▾"; }
+  #routeBtn[aria-expanded="true"]::after { content: " ▴"; }
+  .route-menu[hidden] { display: none; }
+  .route-menu .btn { font-weight: 600; }
   .gallery {
     margin-top: 20px; padding: 16px; background: var(--card); border-radius: 8px;
     box-shadow: var(--shadow); position: relative;
@@ -238,6 +242,12 @@
   <div class="grid">
     <button class="btn" id="photoBtn" type="button" data-i18n="photos">骇爪美图</button>
     <button class="btn btn-accent" id="gameBtn" type="button" data-i18n="game">别笑，你也过不了第二关</button>
+    <button class="btn" id="routeBtn" type="button" aria-expanded="false" aria-controls="routeMenu" data-i18n="route">线路</button>
+  </div>
+
+  <div class="grid route-menu" id="routeMenu" hidden>
+    <a class="btn" href="https://c.wss.ink/f/la1l9pjr3bn" target="_blank" rel="noopener noreferrer">1</a>
+    <a class="btn" href="https://c.wss.ink/f/la1l1ivq7v1" target="_blank" rel="noopener noreferrer">2</a>
   </div>
 
   <section class="gallery" id="gallery" hidden aria-label="Gallery">
@@ -319,7 +329,7 @@
   /* ---------- i18n ---------- */
   const i18n = {
     zh: { title: "数据删除killer导航页", baidu: "百度", bilibili: "B站", PXL: "PXL",
-          mybilibili: "我的b站空间", github: "我的GitHub", photos: "骇爪美图", game: "别笑，你也过不了第二关",
+          mybilibili: "我的b站空间", github: "我的GitHub", photos: "骇爪美图", game: "别笑，你也过不了第二关", route: "线路",
           prev: "上一张", next: "下一张", close: "关闭", alt: "图片",
           termTitle: "访客接入终端", b1: "正在建立访客通道", b2: "正在加载页面资源", b3: "正在检查浏览器兼容性",
           b4: "正在生成访客身份", b5: "初始化完成，请登录", account: "访客账号", role: "访客权限",
@@ -327,7 +337,7 @@
           roleAdmin: "管理员权限", hintAdmin: "管理员账号请输入密码", errPw: "密码错误，请重试",
           okStatus: "接入成功", greet: "欢迎，{n}", greetAdmin: "欢迎，管理员 {n}", defaultName: "未知访客" },
     en: { title: "Data Deletion Killer — Quick Links", baidu: "Baidu", bilibili: "Bilibili", PXL: "PXL",
-          mybilibili: "My Bilibili", github: "My GitHub", photos: "Photo Gallery", game: "Don't laugh, you can't pass level two",
+          mybilibili: "My Bilibili", github: "My GitHub", photos: "Photo Gallery", game: "Don't laugh, you can't pass level two", route: "Routes",
           prev: "Previous", next: "Next", close: "Close", alt: "Photo",
           termTitle: "Visitor Access Terminal", b1: "Opening visitor channel", b2: "Loading page resources", b3: "Checking browser compatibility",
           b4: "Generating visitor identity", b5: "Ready — please sign in", account: "Visitor account", role: "Guest access",
@@ -435,6 +445,15 @@
     if (Math.abs(dx) > 40) step(dx < 0 ? 1 : -1);
     touchX = null;
   });
+
+  /* ---------- 线路菜单 ---------- */
+  const routeBtn = $("routeBtn"), routeMenu = $("routeMenu");
+  function setRoute(open) {
+    routeMenu.hidden = !open;
+    routeBtn.setAttribute("aria-expanded", String(open));
+  }
+  routeBtn.addEventListener("click", () => setRoute(routeMenu.hidden));
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !routeMenu.hidden && !active) setRoute(false); });
 
   /* ---------- Game ---------- */
   const dlg = $("gameDialog");
